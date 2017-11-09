@@ -8,17 +8,17 @@
     "url": "git://github.com/shady2k/node-red-contrib-simple-message-queue.git"
   },
   "keywords": [
-    "node-red", "queue", "trigger", "store", "messages"
+    "node-red", "queue", "trigger", "store", "messages", "ttl"
   ],
   "node-red": {
     "nodes": {
-      "simple-queue": "simple-queue.js"
+      "simple-queue": "simple-message-queue.js"
     }
   },
   "bugs": {
     "url": "https://github.com/shady2k/node-red-contrib-simple-message-queue/issues"
   },
-  "main": "simple-queue.js",
+  "main": "simple-message-queue.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

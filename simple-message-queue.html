@@ -20,7 +20,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="frequency">
+<script type="text/x-red" data-help-name="simple-queue">
   <p>
   	Use this node to store incoming messages in memory queue. Use a feedback from a following action to release the next message.
   	<br/><br/>
@@ -28,15 +28,16 @@
     <h3>Inputs</h3><br/>
     <b>trigger</b>: If a message is received with this property, one message from queue will be released.<br/>
     <b>reset</b>: If a message is received with this property, queue will be cleared.<br/>
+    <b>ttl</b>: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.
   </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('frequency',{
+    RED.nodes.registerType('simple-queue',{
         category: 'storage',
         color: '#ff9900',
         defaults: {
-            name:        {value:"queue1"}
+            name: {value:"queue1"}
         },
         inputs: 1,
         outputs: 1,
