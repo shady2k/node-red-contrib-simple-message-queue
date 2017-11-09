@@ -1,0 +1,27 @@
+{
+  "name": "node-red-contrib-simple-message-queue",
+  "version": "0.0.1",
+  "description": "A node that store incoming messages in memory queue and uses a feedback from a following action to release the next message",
+  "dependencies": {  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shady2k/node-red-contrib-simple-message-queue.git"
+  },
+  "keywords": [
+    "node-red", "queue", "trigger", "store", "messages"
+  ],
+  "node-red": {
+    "nodes": {
+      "simple-queue": "simple-queue.js"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/shady2k/node-red-contrib-simple-message-queue/issues"
+  },
+  "main": "simple-queue.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shady2k <shady2k@gmail.com>",
+  "license": "Apache-2.0"
+}
