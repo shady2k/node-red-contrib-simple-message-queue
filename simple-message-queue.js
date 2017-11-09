@@ -29,53 +29,42 @@ module.exports = function(RED) {
 		node.on("input", function(msg) {
 			var now = Date.now;
 			var context = node.context();
-			var is_sent = false;
 
 			// if queue doesn't exist, create it
 			context.queue = context.queue || [];
 
 			// if the msg is a reset, clear queue
 			if (msg.hasOwnProperty("reset")) {
-			    if (context.queue.length > 0) {
-			        context.queue = [];
-			    }
+		        context.queue = [];
 			} else if (msg.hasOwnProperty("trigger")) {   // if the msg is a trigger one release next message
-			    while(context.queue.length > 0 && !is_sent) {
+		        // Filter overdue messages
+				context.queue = context.queue.filter(function(x) {
+					return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
+				});
+			    if(context.queue.length > 0) {
 			        var m = context.queue.shift();
-			        var ttl = m.ttl || 0;
-
-			        if((now() - m._queuetimestamp) < ttl || ttl == 0) {
-			            is_sent = true;
-			            node.send(m);
-			        }
+		            node.send(m);
 			    }
 			} else {
-		        // Add to queue
+		        // Check if ttl value of new message is positive integer
 		        var ttl = msg.ttl || 0;
-		        if(!isNormalInteger(ttl)) {
-		        	msg.ttl = 0;
-		        }
+		        if(!isNormalInteger(ttl)) ttl = 0;
 
+		        msg.ttl = ttl;
 		        msg._queuetimestamp = now();
-		        context.queue.push(msg);
+		        context.queue.push(msg); // Add to queue
 
 		        // Filter overdue messages
-		        var queue_temp = [];
-			    while(context.queue.length > 0) {
-			        var m = context.queue.shift();
-			        var ttl = m.ttl || 0;
-			        
-			        if((now() - m._queuetimestamp) < ttl || ttl == 0) {
-			        	queue_temp.push(m);
-			        }
-			    }
-			    context.queue = queue_temp;
+				context.queue = context.queue.filter( function(x) {
+					return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
+				});
 			}
-
+			// Update status
 			node.status({fill:"green",shape:"ring",text: context.queue.length});
 		});
 
 		node.on("close", function() {
+			// Update status
 			node.status({fill:"green",shape:"ring",text: 0});
 		});
 	}
