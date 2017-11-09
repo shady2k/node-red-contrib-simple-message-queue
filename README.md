@@ -4,7 +4,9 @@ node-red-contrib-simple-message-queue
 A simple queue node that store incoming messages in memory queue and
 uses a feedback from a following action to release the next message.
 
-Inputs
+![simple-message-queue](https://github.com/shady2k/node-red-contrib-simple-message-queue/raw/master/simple-message-queue.png "Demo flow")
+
+**Inputs**
 
 **trigger**: If a message is received with this property, one message from queue will be released.
 
