@@ -5,6 +5,7 @@ A simple queue node that store incoming messages in memory queue and
 uses a feedback from a following action to release the next message.
 
 Inputs
+
 trigger: If a message is received with this property, one message from queue will be released.
 reset: If a message is received with this property, queue will be cleared.
 
