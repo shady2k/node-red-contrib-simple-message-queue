@@ -32,10 +32,18 @@ module.exports = function(RED) {
 
 			// if queue doesn't exist, create it
 			context.queue = context.queue || [];
+			context.is_disabled = context.is_disabled || false;
 
 			// if the msg is a reset, clear queue
 			if (msg.hasOwnProperty("reset")) {
 		        context.queue = [];
+			} else if (msg.hasOwnProperty("bypass")) {
+				if(msg.bypass) {
+					context.is_disabled = false;
+				} else {
+					context.is_disabled = true;
+					context.queue = [];
+				}
 			} else if (msg.hasOwnProperty("trigger")) {   // if the msg is a trigger one release next message
 		        // Filter overdue messages
 				context.queue = context.queue.filter(function(x) {
@@ -46,18 +54,22 @@ module.exports = function(RED) {
 		            node.send(m);
 			    }
 			} else {
-		        // Check if ttl value of new message is positive integer
-		        var ttl = msg.ttl || 0;
-		        if(!isNormalInteger(ttl)) ttl = 0;
+				if(context.is_disabled) {
+					node.send(msg);
+				} else {
+					// Check if ttl value of new message is positive integer
+					var ttl = msg.ttl || 0;
+					if(!isNormalInteger(ttl)) ttl = 0;
 
-		        msg.ttl = ttl;
-		        msg._queuetimestamp = now();
-		        context.queue.push(msg); // Add to queue
+					msg.ttl = ttl;
+					msg._queuetimestamp = now();
+					context.queue.push(msg); // Add to queue
 
-		        // Filter overdue messages
-				context.queue = context.queue.filter( function(x) {
-					return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
-				});
+					// Filter overdue messages
+					context.queue = context.queue.filter( function(x) {
+						return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
+					});
+				}
 			}
 			// Update status
 			node.status({fill:"green",shape:"ring",text: context.queue.length});
