@@ -18,17 +18,29 @@
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name"/>
     </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-firstMessageBypass" style="display:inline-block; width:auto; vertical-align:top;" />
+        <label for="node-input-firstMessageBypass" style="width:70%;"></i> Bypass first message?</label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-bypassInterval" style="width:70%;"><i class="fa fa-clock-o"></i> Bypass interval (milliseconds):</label>
+        <input type="text" id="node-input-bypassInterval" placeholder="Bypass interval"/>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="simple-queue">
   <p>
   	Use this node to store incoming messages in memory queue. Use a feedback from a following action to release the next message.
   	<br/><br/>
-
     <h3>Inputs</h3><br/>
     <b>trigger</b>: If a message is received with this property, one message from queue will be released.<br/>
     <b>reset</b>: If a message is received with this property, queue will be cleared.<br/>
+    <b>bypass</b>: If a message is received with this property and set to True, queue will be cleared and stops the node from queueing new messages and just passes them through until an message with bypass property and False value is received.</br>
     <b>ttl</b>: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.
+    <br/><br/>
+    <h3>Config</h3><br/>
+    <b>Bypass first message?</b>: If this flag set to True, first message only will be bypassed. Message with Reset property will resume this behaviour. False by default.<br/>
+    <b>Bypass interval</b>: If this value greater than 0, node will wait for specific interval in milliseconds and if only one message in queue, message will be released.<br/>
   </p>
 </script>
 
@@ -37,7 +49,9 @@
         category: 'storage',
         color: '#ff9900',
         defaults: {
-            name: {value:"queue1"}
+            name: {value: "queue1" },
+            firstMessageBypass: {value: false },
+            bypassInterval: {value:"0", validate:RED.validators.regex(/^\+?(0|[1-9]\d*)$/) },
         },
         inputs: 1,
         outputs: 1,

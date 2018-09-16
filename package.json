@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-simple-message-queue",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A node that store incoming messages in memory queue and uses a feedback from a following action to release the next message",
   "dependencies": {  },
   "repository": {

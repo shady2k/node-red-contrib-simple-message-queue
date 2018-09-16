@@ -23,10 +23,13 @@ module.exports = function(RED) {
 
 		RED.nodes.createNode(this, config);
 		this.name = config.name;
+		this.firstMessageBypass = config.firstMessageBypass || false;
+		this.bypassInterval = config.bypassInterval || 0;
+		var isFirstMessage = true;
 		var node = this;
 		
 		// Yes it's true: an incoming message just happened
-		node.on("input", function(msg) {
+		this.on("input", function(msg) {
 			var now = Date.now;
 			var context = node.context();
 
@@ -37,6 +40,7 @@ module.exports = function(RED) {
 			// if the msg is a reset, clear queue
 			if (msg.hasOwnProperty("reset")) {
 		        context.queue = [];
+		        isFirstMessage = true;
 			} else if (msg.hasOwnProperty("bypass")) {
 				if(msg.bypass) {
 					context.is_disabled = false;
@@ -54,7 +58,8 @@ module.exports = function(RED) {
 		            node.send(m);
 			    }
 			} else {
-				if(context.is_disabled) {
+				if(context.is_disabled || (node.firstMessageBypass && isFirstMessage)) {
+					isFirstMessage = false;
 					node.send(msg);
 				} else {
 					// Check if ttl value of new message is positive integer
@@ -69,13 +74,25 @@ module.exports = function(RED) {
 					context.queue = context.queue.filter( function(x) {
 						return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
 					});
+
+					if(node.bypassInterval > 0) {
+						setTimeout(function() {
+							if(context.queue.length == 1) {
+								var m = context.queue.shift();
+								node.send(m);
+								// Update status
+								node.status({fill:"green",shape:"ring",text: context.queue.length});
+							}
+						}, node.bypassInterval);
+					}
 				}
 			}
+
 			// Update status
 			node.status({fill:"green",shape:"ring",text: context.queue.length});
 		});
 
-		node.on("close", function() {
+		this.on("close", function() {
 			// Update status
 			node.status({fill:"green",shape:"ring",text: 0});
 		});
