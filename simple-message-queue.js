@@ -25,7 +25,7 @@ module.exports = function(RED) {
 		this.name = config.name;
 		this.firstMessageBypass = config.firstMessageBypass || false;
 		this.bypassInterval = config.bypassInterval || 0;
-		var isFirstMessage = true;
+		var isBusy = false;
 		var node = this;
 		
 		// Yes it's true: an incoming message just happened
@@ -40,12 +40,13 @@ module.exports = function(RED) {
 			// if the msg is a reset, clear queue
 			if (msg.hasOwnProperty("reset")) {
 		        context.queue = [];
-		        isFirstMessage = true;
+		        isBusy = false;
 			} else if (msg.hasOwnProperty("bypass")) {
 				if(msg.bypass) {
-					context.is_disabled = false;
-				} else {
 					context.is_disabled = true;
+				} else {
+					context.is_disabled = false;
+					isBusy = false;
 					context.queue = [];
 				}
 			} else if (msg.hasOwnProperty("trigger")) {   // if the msg is a trigger one release next message
@@ -56,11 +57,45 @@ module.exports = function(RED) {
 			    if(context.queue.length > 0) {
 			        var m = context.queue.shift();
 		            node.send(m);
+
+					if(node.bypassInterval > 0) {
+						setTimeout(function bypassSend() {
+							if(context.queue.length > 0) {
+								var m = context.queue.shift();
+								node.send(m);
+								if(context.queue.length == 0) {
+									isBusy = false;
+								}
+								setTimeout(bypassSend, node.bypassInterval);
+
+								// Update status
+								node.status({fill:"green",shape:"ring",text: context.queue.length});
+							}
+						}, node.bypassInterval);
+					}
+			    } else {
+			    	isBusy = false;
 			    }
 			} else {
-				if(context.is_disabled || (node.firstMessageBypass && isFirstMessage)) {
-					isFirstMessage = false;
+				if(context.is_disabled || (node.firstMessageBypass && !isBusy)) {
+					isBusy = true;
 					node.send(msg);
+
+					if(node.bypassInterval > 0) {
+						setTimeout(function bypassSend() {
+							if(context.queue.length > 0) {
+								var m = context.queue.shift();
+								node.send(m);
+								if(context.queue.length == 0) {
+									isBusy = false;
+								}
+								setTimeout(bypassSend, node.bypassInterval);
+
+								// Update status
+								node.status({fill:"green",shape:"ring",text: context.queue.length});
+							}
+						}, node.bypassInterval);
+					}
 				} else {
 					// Check if ttl value of new message is positive integer
 					var ttl = msg.ttl || 0;
@@ -74,17 +109,6 @@ module.exports = function(RED) {
 					context.queue = context.queue.filter( function(x) {
 						return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
 					});
-
-					if(node.bypassInterval > 0) {
-						setTimeout(function() {
-							if(context.queue.length == 1) {
-								var m = context.queue.shift();
-								node.send(m);
-								// Update status
-								node.status({fill:"green",shape:"ring",text: context.queue.length});
-							}
-						}, node.bypassInterval);
-					}
 				}
 			}
 

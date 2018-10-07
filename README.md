@@ -1,7 +1,7 @@
 node-red-contrib-simple-message-queue
 ================================
 
-A simple queue node that store incoming messages in memory queue and uses a `trigger` property from an incoming message to release the next message stored in queue.
+A simple queue node that store incoming messages in memory queue and uses a feedback from a following action to release the next message stored in the queue or trigger message.
 
 ![simple-message-queue](https://github.com/shady2k/node-red-contrib-simple-message-queue/raw/master/simple-message-queue.png "Demo flow")
 
@@ -15,9 +15,9 @@ A simple queue node that store incoming messages in memory queue and uses a `tri
 
 **Config**
 
-**Bypass first message?**: If this flag set to True, first message only will be bypassed. Message with Reset property will resume this behaviour. False by default.
+**Bypass first message?**: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.
 
-**Bypass interval**: If this value greater than 0, node will wait for specific interval in milliseconds and if only one message in queue, message will be released.
+**Bypass interval**: If this value greater than 0, node will realease message from queue without trigger after specific interval in milliseconds since last message send.
 
 This node is based on https://gist.github.com/dceejay/cea8afa28b7a93ebdc0f - respect to @dceejay (Dave Conway-Jones) https://github.com/dceejay
 

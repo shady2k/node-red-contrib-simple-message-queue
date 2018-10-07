@@ -30,7 +30,7 @@
 
 <script type="text/x-red" data-help-name="simple-queue">
   <p>
-  	Use this node to store incoming messages in memory queue. Use a feedback from a following action to release the next message.
+  	Use this node to store incoming messages in memory queue. Use a feedback from a following action or message with trigger property to release the next message.
   	<br/><br/>
     <h3>Inputs</h3><br/>
     <b>trigger</b>: If a message is received with this property, one message from queue will be released.<br/>
@@ -39,8 +39,8 @@
     <b>ttl</b>: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.
     <br/><br/>
     <h3>Config</h3><br/>
-    <b>Bypass first message?</b>: If this flag set to True, first message only will be bypassed. Message with Reset property will resume this behaviour. False by default.<br/>
-    <b>Bypass interval</b>: If this value greater than 0, node will wait for specific interval in milliseconds and if only one message in queue, message will be released.<br/>
+    <b>Bypass first message?</b>: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.<br/>
+    <b>Bypass interval</b>: If this value greater than 0, node will realease message from queue without trigger after specific interval in milliseconds since last message send.<br/>
   </p>
 </script>
 
@@ -50,7 +50,7 @@
         color: '#ff9900',
         defaults: {
             name: {value: "queue1" },
-            firstMessageBypass: {value: false },
+            firstMessageBypass: {value: true },
             bypassInterval: {value:"0", validate:RED.validators.regex(/^\+?(0|[1-9]\d*)$/) },
         },
         inputs: 1,
