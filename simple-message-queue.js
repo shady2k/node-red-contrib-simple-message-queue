@@ -18,14 +18,57 @@ module.exports = function(RED) {
 	function isNormalInteger(str) {
 	    return /^\+?(0|[1-9]\d*)$/.test(str);
 	}
+	
+	function setBusyFalse(smq) {
+		clearTimeout(smq.bypassTimer);
+		smq.bypassTimer = null;
+		smq.isBusy = false;
+	}
+	
+	function setBusyTrue(smq) {
+		smq.isBusy = true;
+	}
+
+	function bypassQueue(smq, context, node) {
+		if(smq.bypassInterval > 0 && context.queue.length > 0 && !smq.bypassTimer) {
+			smq.bypassTimer = setTimeout(function bypassSend() {
+				smq.bypassTimer = null;
+				if(context.queue.length > 0) {
+					var m = context.queue.shift();
+					m.queueCount = context.queue.length;
+					node.send(m);
+					
+					if(context.queue.length == 0) {
+						smq.isBusy = false;
+					}
+					
+					if(context.queue.length > 0) {
+						smq.bypassTimer = setTimeout(bypassSend, smq.bypassInterval);
+					}
+
+					// Update status
+					node.status({fill:"green",shape:"ring",text: context.queue.length});
+				} else {
+					smq.bypassTimer = null;
+					smq.isBusy = false;					
+				}
+			}, smq.bypassInterval);
+		}
+	}
+	
+	function stopBypassTimer(smq) {
+		clearTimeout(smq.bypassTimer);
+		smq.bypassTimer = null;
+	}
 
 	function simpleMessageQueueNode(config) {
 
 		RED.nodes.createNode(this, config);
-		this.name = config.name;
-		this.firstMessageBypass = config.firstMessageBypass || false;
-		this.bypassInterval = config.bypassInterval || 0;
-		var isBusy = false;
+		var smq = {};
+		smq.firstMessageBypass = config.firstMessageBypass || false;
+		smq.bypassInterval = config.bypassInterval || 0;
+		smq.isBusy = false;
+		smq.bypassTimer = null;
 		var node = this;
 		
 		// Yes it's true: an incoming message just happened
@@ -40,13 +83,16 @@ module.exports = function(RED) {
 			// if the msg is a reset, clear queue
 			if (msg.hasOwnProperty("reset")) {
 		        context.queue = [];
-		        isBusy = false;
+		        setBusyFalse(smq);
+		    } else if (msg.hasOwnProperty("queueCount")) {
+		    	msg.queueCount = context.queue.length;
+		    	node.send(msg);
 			} else if (msg.hasOwnProperty("bypass")) {
 				if(msg.bypass) {
 					context.is_disabled = true;
 				} else {
 					context.is_disabled = false;
-					isBusy = false;
+					setBusyFalse(smq);
 					context.queue = [];
 				}
 			} else if (msg.hasOwnProperty("trigger")) {   // if the msg is a trigger one release next message
@@ -56,46 +102,20 @@ module.exports = function(RED) {
 				});
 			    if(context.queue.length > 0) {
 			        var m = context.queue.shift();
+			        m.queueCount = context.queue.length;
 		            node.send(m);
-
-					if(node.bypassInterval > 0) {
-						setTimeout(function bypassSend() {
-							if(context.queue.length > 0) {
-								var m = context.queue.shift();
-								node.send(m);
-								if(context.queue.length == 0) {
-									isBusy = false;
-								}
-								setTimeout(bypassSend, node.bypassInterval);
-
-								// Update status
-								node.status({fill:"green",shape:"ring",text: context.queue.length});
-							}
-						}, node.bypassInterval);
-					}
+					stopBypassTimer(smq);
+					bypassQueue(smq, context, node);
 			    } else {
-			    	isBusy = false;
+			    	setBusyFalse(smq);
 			    }
 			} else {
-				if(context.is_disabled || (node.firstMessageBypass && !isBusy)) {
-					isBusy = true;
+				if(context.is_disabled || (smq.firstMessageBypass && !smq.isBusy)) {
+					setBusyTrue(smq);
+					msg.queueCount = context.queue.length;
 					node.send(msg);
-
-					if(node.bypassInterval > 0) {
-						setTimeout(function bypassSend() {
-							if(context.queue.length > 0) {
-								var m = context.queue.shift();
-								node.send(m);
-								if(context.queue.length == 0) {
-									isBusy = false;
-								}
-								setTimeout(bypassSend, node.bypassInterval);
-
-								// Update status
-								node.status({fill:"green",shape:"ring",text: context.queue.length});
-							}
-						}, node.bypassInterval);
-					}
+					stopBypassTimer(smq);
+					bypassQueue(smq, context, node);
 				} else {
 					// Check if ttl value of new message is positive integer
 					var ttl = msg.ttl || 0;
@@ -112,6 +132,7 @@ module.exports = function(RED) {
 				}
 			}
 
+			bypassQueue(smq, context, node);
 			// Update status
 			node.status({fill:"green",shape:"ring",text: context.queue.length});
 		});
