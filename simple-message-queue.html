@@ -37,7 +37,7 @@
     <b>reset</b>: If a message is received with this property, queue will be cleared.<br/>
     <b>bypass</b>: If a message is received with this property and set to True, queue will be cleared and stops the node from queueing new messages and just passes them through until an message with bypass property and False value is received.</br>
     <b>ttl</b>: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.</br>
-    <b>queueCount</b>: If a message is received with this property, node will send message with number of messages left in the queue in queueCount property. This message won't store in queue.<br/>
+    <b>queueCount</b>: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.<br/>
     <br/>
     <h3>Config</h3><br/>
     <b>Bypass first message?</b>: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.<br/>

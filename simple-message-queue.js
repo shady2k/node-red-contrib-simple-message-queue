@@ -35,7 +35,7 @@ module.exports = function(RED) {
 				smq.bypassTimer = null;
 				if(context.queue.length > 0) {
 					var m = context.queue.shift();
-					m.queueCount = context.queue.length;
+					m["_queueCount"] = context.queue.length;
 					node.send(m);
 					
 					if(context.queue.length == 0) {
@@ -85,7 +85,7 @@ module.exports = function(RED) {
 		        context.queue = [];
 		        setBusyFalse(smq);
 		    } else if (msg.hasOwnProperty("queueCount")) {
-		    	msg.queueCount = context.queue.length;
+		    	msg["_queueCount"] = context.queue.length;
 		    	node.send(msg);
 			} else if (msg.hasOwnProperty("bypass")) {
 				if(msg.bypass) {
@@ -102,7 +102,7 @@ module.exports = function(RED) {
 				});
 			    if(context.queue.length > 0) {
 			        var m = context.queue.shift();
-			        m.queueCount = context.queue.length;
+			        m["_queueCount"] = context.queue.length;
 		            node.send(m);
 					stopBypassTimer(smq);
 					bypassQueue(smq, context, node);
@@ -112,7 +112,7 @@ module.exports = function(RED) {
 			} else {
 				if(context.is_disabled || (smq.firstMessageBypass && !smq.isBusy)) {
 					setBusyTrue(smq);
-					msg.queueCount = context.queue.length;
+					msg["_queueCount"] = context.queue.length;
 					node.send(msg);
 					stopBypassTimer(smq);
 					bypassQueue(smq, context, node);
