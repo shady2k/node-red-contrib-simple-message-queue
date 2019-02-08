@@ -5,7 +5,7 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 
 ![simple-message-queue](https://github.com/shady2k/node-red-contrib-simple-message-queue/raw/master/simple-message-queue.png "Demo flow")
 
-**Inputs**
+#Inputs
 
 **trigger**: If a message is received with this property, one message from the queue will be released. The outbound message will have a _queueCount property with number of messages left in the queue. _queueCount will not include the message triggered. For example, if the message triggered is the last one in the queue, _queueCount will be 0 (zero).
 
