@@ -20,10 +20,10 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 **Input hierarchy**</br>
 </br>
 The following illustrates how the node will respond if more than one of the properties listed above is included in an incoming message.</br>
-#1 **reset** -- the highest priority. if a message has a reset property, all other properties will be ignored.</br>
-#2 **queueCount** -- will override trigger and bypass. The resulting outbound message will include the _queueCount property and the queueCount property will be removed. Any other properties on the incoming message will be ignored.</br>
-#3 **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.</br>
-#4 **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.</br>
+1. **reset** -- the highest priority. if a message has a reset property, all other properties will be ignored.</br>
+2. **queueCount** -- will override trigger and bypass. The resulting outbound message will include the _queueCount property and the queueCount property will be removed. Any other properties on the incoming message will be ignored.</br>
+3. **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.</br>
+4. **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.</br>
 
 **Config**
 
