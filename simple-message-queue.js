@@ -93,7 +93,7 @@ module.exports = function(RED) {
 				} else {
 					context.is_disabled = false;
 					setBusyFalse(smq);
-					context.queue = [];
+					//context.queue = [];
 				}
 			} else if (msg.hasOwnProperty("trigger")) {   // if the msg is a trigger one release next message
 		        // Filter overdue messages

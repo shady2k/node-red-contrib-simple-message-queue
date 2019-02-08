@@ -7,13 +7,22 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 
 **Inputs**
 
-**trigger**: If a message is received with this property, one message from queue will be released. Every message have queueCount property with number of messages left in the queue at the moment.
+**trigger**: If a message is received with this property, one message from the queue will be released. The outbound message will have a _queueCount property with number of messages left in the queue. _queueCount will not include the message triggered. For example, if the message triggered is the last one in the queue, _queueCount will be 0 (zero).
 
-**reset**: If a message is received with this property, queue will be cleared.
+**reset**: If a message is received with the reset property, all messages in the queue will be cleared. In addition, the node will not forward the incoming reset message for processing by any subsequent nodes in the sequence.
 
-**ttl**: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.
+**ttl**: If a message is received with this property, a message will be added to the queue and will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second. If message with TTL property has not been released for specified time, it will be deleted from queue without any output.
 
 **queueCount**: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.
+
+**bypass**: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.
+
+**Input hierarchy**
+The following illustrates how the node will respond if more than one of the properties listed above is included in an incoming message.
+#1 **reset** -- the highest priority. if a message has a reset property, all other properties will be ignored.
+#2 **queueCount** -- will override trigger and bypass. The resulting outbound message will include the _queueCount property and the queueCount property will be removed. Any other properties on the incoming message will be ignored.
+#3 **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.
+#4 **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.
 
 **Config**
 

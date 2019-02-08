@@ -33,11 +33,11 @@
   	Use this node to store incoming messages in memory queue. Use a feedback from a following action or message with trigger property to release the next message.
   	<br/><br/>
     <h3>Inputs</h3><br/>
-    <b>trigger</b>: If a message is received with this property, one message from queue will be released.<br/>
-    <b>reset</b>: If a message is received with this property, queue will be cleared.<br/>
-    <b>bypass</b>: If a message is received with this property and set to True, queue will be cleared and stops the node from queueing new messages and just passes them through until an message with bypass property and False value is received.</br>
-    <b>ttl</b>: If a message is received with this property, message added to the queue will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second or until it is delivered.</br>
+    <b>trigger</b>: If a message is received with this property, one message from the queue will be released. The outbound message will have a _queueCount property with number of messages left in the queue. _queueCount will not include the message triggered. For example, if the message triggered is the last one in the queue, _queueCount will be 0 (zero).<br/>
+    <b>reset</b>: If a message is received with the reset property, all messages in the queue will be cleared. In addition, the node will not forward the incoming reset message for processing by any subsequent nodes in the sequence.<br/>
+    <b>ttl</b>: If a message is received with this property, a message will be added to the queue and will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second. If message with TTL property has not been released for specified time, it will be deleted from queue without any output.</br>
     <b>queueCount</b>: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.<br/>
+    <b>bypass</b>: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.</br>
     <br/>
     <h3>Config</h3><br/>
     <b>Bypass first message?</b>: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.<br/>
