@@ -1,6 +1,11 @@
 node-red-contrib-simple-message-queue
 ================================
 
+[![NPM version](http://img.shields.io/npm/v/node-red-contrib-simple-message-queue.svg)](https://www.npmjs.com/package/node-red-contrib-simple-message-queue)
+[![Downloads](https://img.shields.io/npm/dm/node-red-contrib-simple-message-queue.svg)](https://www.npmjs.com/package/node-red-contrib-simple-message-queue)
+
+[![NPM](https://nodei.co/npm/node-red-contrib-simple-message-queue.png?downloads=true)](https://nodei.co/npm/node-red-contrib-simple-message-queue/)
+
 A simple queue node that store incoming messages in memory queue and uses a feedback from a following action or trigger message to release the next message stored in the queue.
 
 ![simple-message-queue](https://github.com/shady2k/node-red-contrib-simple-message-queue/raw/master/simple-message-queue.png "Demo flow")
