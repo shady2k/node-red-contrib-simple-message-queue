@@ -21,12 +21,15 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 
 **bypass**: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.
 
+**bypassInterval**: Message with this property allow to dynamically change bypass interval in milliseconds from config, 0 - no bypass.
+
 ## Input hierarchy
 The following illustrates how the node will respond if more than one of the properties listed above is included in an incoming message.
 1. **reset** -- the highest priority. if a message has a reset property, all other properties will be ignored.
 2. **queueCount** -- will override trigger and bypass. The resulting outbound message will include the _queueCount property and the queueCount property will be removed. Any other properties on the incoming message will be ignored.
-3. **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.
-4. **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.
+3. **bypassInterval** -- higher priority than queueCount. Message with this property won't store in queue and trigger any messages.
+4. **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.
+5. **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.
 
 # Config
 **Bypass first message?**: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.

@@ -38,6 +38,7 @@
     <b>ttl</b>: If a message is received with this property, a message will be added to the queue and will live in the queue for specific value in milliseconds. The value of the TTL must be a non-negative integer (0 <= n), describing the TTL period in milliseconds. Thus a value of 1000 means that a message added to the queue will live in the queue for 1 second. If message with TTL property has not been released for specified time, it will be deleted from queue without any output.</br>
     <b>queueCount</b>: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.<br/>
     <b>bypass</b>: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.</br>
+    <b>bypassInterval</b>: Message with this property allow to dynamically change bypass interval in milliseconds from config, 0 - no bypass.</br>
     <br/>
     <h3>Config</h3><br/>
     <b>Bypass first message?</b>: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.<br/>

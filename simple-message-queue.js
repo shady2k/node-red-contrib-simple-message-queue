@@ -87,6 +87,11 @@ module.exports = function(RED) {
 		    } else if (msg.hasOwnProperty("queueCount")) {
 		    	msg["_queueCount"] = context.queue.length;
 		    	node.send(msg);
+			} else if (msg.hasOwnProperty("bypassInterval")) {
+				let re = /^\+?(0|[1-9]\d*)$/;
+				if(re.test(msg.bypassInterval)) {
+					smq.bypassInterval = msg.bypassInterval;
+				}
 			} else if (msg.hasOwnProperty("bypass")) {
 				if(msg.bypass) {
 					context.is_disabled = true;
