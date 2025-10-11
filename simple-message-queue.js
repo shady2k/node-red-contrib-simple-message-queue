@@ -86,6 +86,17 @@ module.exports = function (RED) {
 			} else if (msg.hasOwnProperty("queueCount")) {
 				msg["_queueCount"] = context.queue.length;
 				node.send(msg);
+			} else if (msg.hasOwnProperty("peek")) {
+				// Filter overdue messages
+				context.queue = context.queue.filter(function (x) {
+					return ((now() - x._queuetimestamp) < x.ttl || x.ttl == 0);
+				});
+				if (context.queue.length > 0) {
+					// Create a deep copy of the first message without removing it from queue
+					var peekMsg = JSON.parse(JSON.stringify(context.queue[0]));
+					peekMsg["_queueCount"] = context.queue.length;
+					node.send(peekMsg);
+				}
 			} else if (msg.hasOwnProperty("bypassInterval")) {
 				let re = /^\+?(0|[1-9]\d*)$/;
 				if (re.test(msg.bypassInterval)) {

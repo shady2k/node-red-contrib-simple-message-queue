@@ -8,7 +8,13 @@
     "url": "git://github.com/shady2k/node-red-contrib-simple-message-queue.git"
   },
   "keywords": [
-    "node-red", "queue", "trigger", "store", "messages", "ttl"
+    "node-red", "queue", "trigger", "store", "messages", "ttl", "peek"
+  ],
+  "files": [
+    "simple-message-queue.js",
+    "simple-message-queue.html",
+    "icons/",
+    "README.md"
   ],
   "node-red": {
     "nodes": {
