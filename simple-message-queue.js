@@ -74,6 +74,7 @@ module.exports = function (RED) {
 		this.on("input", function (msg) {
 			var now = Date.now;
 			var context = node.context();
+			var skipStatusUpdate = false;
 
 			// if queue doesn't exist, create it
 			context.queue = context.queue || [];
@@ -95,8 +96,10 @@ module.exports = function (RED) {
 					// Create a deep copy of the first message without removing it from queue
 					var peekMsg = JSON.parse(JSON.stringify(context.queue[0]));
 					peekMsg["_queueCount"] = context.queue.length;
+					peekMsg["_isPeek"] = true;
 					node.send(peekMsg);
 				}
+				skipStatusUpdate = true;
 			} else if (msg.hasOwnProperty("bypassInterval")) {
 				let re = /^\+?(0|[1-9]\d*)$/;
 				if (re.test(msg.bypassInterval)) {
@@ -148,8 +151,10 @@ module.exports = function (RED) {
 			}
 
 			bypassQueue(smq, context, node);
-			// Update status
-			node.status({ fill: "green", shape: "ring", text: context.queue.length });
+			// Update status (skip for peek to avoid triggering status nodes)
+			if (!skipStatusUpdate) {
+				node.status({ fill: "green", shape: "ring", text: context.queue.length });
+			}
 		});
 
 		this.on("close", function () {

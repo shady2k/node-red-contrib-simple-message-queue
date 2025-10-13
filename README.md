@@ -19,7 +19,7 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 
 **queueCount**: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.
 
-**peek**: If a message is received with this property, the node will send a copy of the next message in the queue without removing it from the queue. The outbound message will have a _queueCount property with number of messages left in the queue. This message won't be stored in the queue.
+**peek**: If a message is received with this property, the node will send a copy of the next message in the queue without removing it from the queue. The outbound message will have a _queueCount property with number of messages left in the queue and a _isPeek property set to true to distinguish it from triggered messages. This operation does not trigger status nodes. This message won't be stored in the queue.
 
 **bypass**: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.
 
@@ -29,7 +29,7 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 The following illustrates how the node will respond if more than one of the properties listed above is included in an incoming message.
 1. **reset** -- the highest priority. if a message has a reset property, all other properties will be ignored.
 2. **queueCount** -- will override trigger and bypass. The resulting outbound message will include the _queueCount property and the queueCount property will be removed. Any other properties on the incoming message will be ignored.
-3. **peek** -- will send a copy of the next message in the queue without removing it. The resulting outbound message will include the _queueCount property. Message with peek property won't store in queue and trigger any messages.
+3. **peek** -- will send a copy of the next message in the queue without removing it. The resulting outbound message will include the _queueCount property and _isPeek property set to true. This operation does not trigger status nodes. Message with peek property won't store in queue and trigger any messages.
 4. **bypassInterval** -- higher priority than bypass. Message with this property won't store in queue and trigger any messages.
 5. **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.
 6. **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.
