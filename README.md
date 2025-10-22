@@ -19,7 +19,7 @@ A simple queue node that store incoming messages in memory queue and uses a feed
 
 **queueCount**: If a message is received with this property, node will send message with number of messages left in the queue in _queueCount property. This message won't store in queue.
 
-**peek**: If a message is received with this property, the node will send a copy of the next message in the queue without removing it from the queue. The outbound message will have a _queueCount property with number of messages left in the queue and a _isPeek property set to true to distinguish it from triggered messages. This operation does not trigger status nodes. This message won't be stored in the queue.
+**peek**: If a message is received with this property, the node will send a copy of the next message in the queue without removing it from the queue. The outbound message will have a _queueCount property with number of messages left in the queue, a _isPeek property set to true, and a _triggerSource property set to "peek" to distinguish it from triggered messages. This operation does not trigger status nodes. This message won't be stored in the queue.
 
 **bypass**: If a message is received with this property, and it set to true, bypass mode will turned on and all new incoming messages will be bypassed to output with _queueCount property, messaged in queue will not be cleared. If bypass property set to false, bypass mode will turned off and node return to normal operational, queue will not be cleared. Message with bypass property won't store in queue and trigger any messages.
 
@@ -33,6 +33,20 @@ The following illustrates how the node will respond if more than one of the prop
 4. **bypassInterval** -- higher priority than bypass. Message with this property won't store in queue and trigger any messages.
 5. **bypass** -- higher priority than trigger. Message with bypass property won't store in queue and trigger any messages.
 6. **trigger** -- one message from queue will be released as a result of a trigger message, it will include a _queueCount property. Message with trigger property won't store in queue.
+
+# Output Properties
+All messages released from the queue will include the following properties:
+
+**_queueCount**: Number of messages remaining in the queue after this message was released.
+
+**_triggerSource**: A string indicating how the message was released. Possible values:
+- `"trigger"` - Message was released by an explicit trigger command
+- `"bypassInterval"` - Message was released automatically by the bypass interval timer
+- `"bypass"` - Message was sent directly because bypass mode is enabled
+- `"firstMessage"` - Message was sent as the first message bypass
+- `"peek"` - Message was retrieved using peek (also includes `_isPeek: true`)
+
+These properties allow you to differentiate and handle messages differently based on how they were released in your Node-RED flows.
 
 # Config
 **Bypass first message?**: If this flag set to True, first new message will be bypassed, than node will be busy until it's not get message with trigger property. True by default.

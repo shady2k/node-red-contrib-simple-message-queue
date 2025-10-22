@@ -35,6 +35,7 @@ module.exports = function (RED) {
 				if (context.queue.length > 0) {
 					var m = context.queue.shift();
 					m["_queueCount"] = context.queue.length;
+					m["_triggerSource"] = "bypassInterval";
 					node.send(m);
 
 					if (context.queue.length == 0) {
@@ -97,6 +98,7 @@ module.exports = function (RED) {
 					var peekMsg = JSON.parse(JSON.stringify(context.queue[0]));
 					peekMsg["_queueCount"] = context.queue.length;
 					peekMsg["_isPeek"] = true;
+					peekMsg["_triggerSource"] = "peek";
 					node.send(peekMsg);
 				}
 				skipStatusUpdate = true;
@@ -121,6 +123,7 @@ module.exports = function (RED) {
 				if (context.queue.length > 0) {
 					var m = context.queue.shift();
 					m["_queueCount"] = context.queue.length;
+					m["_triggerSource"] = "trigger";
 					node.send(m);
 					stopBypassTimer(smq);
 					bypassQueue(smq, context, node);
@@ -131,6 +134,11 @@ module.exports = function (RED) {
 				if (context.is_disabled || (smq.firstMessageBypass && !smq.isBusy)) {
 					setBusyTrue(smq);
 					msg["_queueCount"] = context.queue.length;
+					if (context.is_disabled) {
+						msg["_triggerSource"] = "bypass";
+					} else {
+						msg["_triggerSource"] = "firstMessage";
+					}
 					node.send(msg);
 					stopBypassTimer(smq);
 					bypassQueue(smq, context, node);
